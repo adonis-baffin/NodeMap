@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';  // 只 import hook，不 import React 本身
 import ReactFlow, {
   addEdge,
   Background,
@@ -93,7 +93,6 @@ export default function App() {
     setMenu(null);
   };
 
-  // 动态计算 R/U
   const getInputs = (nodeId: string) => {
     return edges
       .filter((e) => e.target === nodeId)
@@ -106,7 +105,6 @@ export default function App() {
       .map((e) => nodes.find((n) => n.id === e.target)?.data.label || '未知用途');
   };
 
-  // 保存/加载函数
   const saveBlueprint = () => {
     const data = { nodes, edges };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -128,7 +126,7 @@ export default function App() {
         setNodes(data.nodes || []);
         setEdges(data.edges || []);
       } catch (err) {
-        alert('加载失败：文件格式错');
+        alert('加载失败：文件格式错误');
       }
     };
     reader.readAsText(file);
@@ -136,20 +134,18 @@ export default function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* 顶部按钮栏 */}
+      {/* 顶部按钮 */}
       <div style={{ background: '#111', padding: '12px', display: 'flex', gap: '16px', alignItems: 'center' }}>
         <button onClick={saveBlueprint} style={{ padding: '12px 24px', fontSize: '16px', background: '#4caf50', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-          💾 保存整图为 JSON 文件
+          💾 保存整图
         </button>
         <label style={{ padding: '12px 24px', fontSize: '16px', background: '#2196f3', color: 'white', borderRadius: '8px', cursor: 'pointer' }}>
-          📂 加载 JSON 文件
+          📂 加载整图
           <input type="file" accept=".json" onChange={loadBlueprint} style={{ display: 'none' }} />
         </label>
-        <span style={{ color: '#aaa', marginLeft: 'auto' }}>右键空白加节点 | 双击节点编辑文字 | 点击节点查看动态 R/U</span>
       </div>
 
       <div style={{ display: 'flex', flex: 1 }}>
-        {/* 主蓝图 */}
         <div style={{ flex: 1 }}>
           <ReactFlow
             nodes={nodes}
@@ -166,15 +162,13 @@ export default function App() {
             <Background />
             <Controls />
             <MiniMap />
-
-            {/* 右键菜单 */}
             {menu && (
-              <div style={{ position: 'absolute', top: menu.top, left: menu.left, background: 'white', border: '1px solid #ccc', borderRadius: '8px', padding: '12px', zIndex: 1000, boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
-                <div style={{ cursor: 'pointer', padding: '8px', fontWeight: 'bold' }} onClick={() => addNode('新物品', 'item')}>
-                  ➕ 加物品节点（绿色）
+              <div style={{ position: 'absolute', top: menu.top, left: menu.left, background: 'white', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
+                <div style={{ cursor: 'pointer', padding: '8px' }} onClick={() => addNode('新物品', 'item')}>
+                  ➕ 加物品（绿）
                 </div>
-                <div style={{ cursor: 'pointer', padding: '8px', fontWeight: 'bold' }} onClick={() => addNode('新机器', 'machine')}>
-                  ➕ 加机器节点（蓝色）
+                <div style={{ cursor: 'pointer', padding: '8px' }} onClick={() => addNode('新机器', 'machine')}>
+                  ➕ 加机器（蓝）
                 </div>
                 <div style={{ cursor: 'pointer', padding: '8px' }} onClick={() => setMenu(null)}>
                   关闭
@@ -184,42 +178,34 @@ export default function App() {
           </ReactFlow>
         </div>
 
-        {/* 右侧侧边栏：动态 R/U */}
-        <div style={{ width: '400px', background: '#2d2d2d', color: '#fff', padding: '24px', overflowY: 'auto' }}>
-          <h2 style={{ marginTop: 0 }}>节点详情（动态计算）</h2>
+        <div style={{ width: '400px', background: '#2d2d2d', color: '#fff', padding: '24px' }}>
+          <h2>节点详情</h2>
           {selectedNode ? (
             <div>
-              <h3 style={{ color: '#ffdd00', marginBottom: '16px' }}>{selectedNode.data.label}</h3>
-
-              <div style={{ marginBottom: '24px' }}>
-                <strong style={{ color: '#88ff88' }}>Recipe（输入/产出配方）:</strong>
-                {getInputs(selectedNode.id).length > 0 ? (
-                  <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                    {getInputs(selectedNode.id).map((input, i) => (
-                      <li key={i}>输入来自：{input}</li>
-                    ))}
-                    <li>（这个节点产出供下游使用）</li>
-                  </ul>
-                ) : (
-                  <p style={{ margin: '8px 0', color: '#aaa' }}>无输入（可能是资源起点）</p>
-                )}
-              </div>
-
-              <div>
-                <strong style={{ color: '#ff8888' }}>Usage（用途）:</strong>
-                {getOutputs(selectedNode.id).length > 0 ? (
-                  <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                    {getOutputs(selectedNode.id).map((output, i) => (
-                      <li key={i}>输出到：{output}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={{ margin: '8px 0', color: '#aaa' }}>无输出（可能是终点）</p>
-                )}
-              </div>
+              <h3>{selectedNode.data.label}</h3>
+              <strong>输入：</strong>
+              {getInputs(selectedNode.id).length > 0 ? (
+                <ul>
+                  {getInputs(selectedNode.id).map((input, i) => (
+                    <li key={i}>{input}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>无输入</p>
+              )}
+              <strong>输出：</strong>
+              {getOutputs(selectedNode.id).length > 0 ? (
+                <ul>
+                  {getOutputs(selectedNode.id).map((output, i) => (
+                    <li key={i}>{output}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>无输出</p>
+              )}
             </div>
           ) : (
-            <p style={{ color: '#aaa' }}>← 点击左侧节点查看动态 Recipe / Usage（根据连线自动计算）</p>
+            <p>点击节点查看</p>
           )}
         </div>
       </div>

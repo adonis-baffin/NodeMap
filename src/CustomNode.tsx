@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';  // 只 import useState
 import { Handle, Position, NodeProps } from 'reactflow';
 
 export const CustomNode: React.FC<NodeProps> = ({ data }) => {
@@ -8,7 +8,7 @@ export const CustomNode: React.FC<NodeProps> = ({ data }) => {
   return (
     <div
       style={{
-        background: data.type === 'machine' ? '#3366cc' : '#66cc66', // 机器蓝，物品绿
+        background: data.type === 'machine' ? '#3366cc' : '#66cc66',
         color: 'white',
         padding: '16px',
         borderRadius: '8px',
@@ -27,7 +27,7 @@ export const CustomNode: React.FC<NodeProps> = ({ data }) => {
           onChange={(e) => setLabel(e.target.value)}
           onBlur={() => {
             setEditing(false);
-            data.label = label; // 更新数据
+            data.label = label;
           }}
           autoFocus
           style={{ width: '100%', textAlign: 'center', background: 'transparent', color: 'white', border: 'none' }}
